@@ -1,0 +1,5 @@
+# Reproduction case for [Cypress issue #23131](https://github.com/cypress-io/cypress/issues/23131)
+
+This is a demonstration of achieving an Out of Memory error in the browser by generating *massive* amounts of test runner log output. In this contrived example, randomly-generated JSON data is loaded from a fixture and then asserted against using a string matcher. The string match is output to the test log with the entirety of the input string which is multiple megabytes - when looped, this continues to build the browsers memory footprint until it fails to allocate more memory (~4GB for a tab by default in Chrome). This indicates that the runner UI is holding the entirety of the test log in memory at one time, even if the execution is split across multiple tests which are collapsed after execution.
+
+The originally-reported user scenario was validating the output of a service using `cy.request` multiple (~40) times across a spec, and this service must have been returning *huge* amounts of data that were then searched using matchers that output the entire payload to the log.
